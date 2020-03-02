@@ -15,7 +15,7 @@ func TestRing_Take(t *testing.T) {
 	for {
 		select {
 		case <-ticker.C:
-			for i := 0; i < 8193; i++ {
+			for i := 0; i < 1<<16; i++ {
 				id, err := ring.Take()
 				if err != nil {
 					log.Println("take id err", err)
