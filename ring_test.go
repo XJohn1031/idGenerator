@@ -7,7 +7,7 @@ import (
 )
 
 func TestRing_Take(t *testing.T) {
-	ring := NewRing(1<<17, GetWorkId("config.json"))
+	ring := NewRing(1<<17, 1)
 	result := make(map[uint64]bool, 0)
 	ticker := time.NewTicker(1e9)
 

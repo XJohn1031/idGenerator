@@ -50,16 +50,16 @@ func NewRing(bufferSize int, workId uint64) *Ring {
 		},
 		idStruct: NewIDStruct(28, 18, 17),
 	}
-	ring.productFunc = ring.Product
-	ring.paddingExecutor.provider = ring.Provider
+	ring.productFunc = ring.product
+	ring.paddingExecutor.provider = ring.provider
 
 	ring.productFunc(uint64(time.Now().Unix()))
 
-	go ring.SchedulePut()
+	go ring.schedulePut()
 	return ring
 }
 
-func (r *Ring) SchedulePut() {
+func (r *Ring) schedulePut() {
 	schedule := time.NewTicker(time.Second)
 	for {
 		select {
@@ -69,7 +69,7 @@ func (r *Ring) SchedulePut() {
 	}
 }
 
-func (r *Ring) Provider(timestamp uint64, workId uint64) (ids []uint64, err error) {
+func (r *Ring) provider(timestamp uint64, workId uint64) (ids []uint64, err error) {
 	firstId, err := r.idStruct.GenerateID(timestamp, workId, 0)
 	if err != nil {
 		log.Printf("err is %v", err)
@@ -83,7 +83,7 @@ func (r *Ring) Provider(timestamp uint64, workId uint64) (ids []uint64, err erro
 	return result, nil
 }
 
-func (r *Ring) Put(uid uint64) bool {
+func (r *Ring) put(uid uint64) bool {
 	if (r.productPosition - r.consumePosition) == int64(r.bufferSize-1) {
 		log.Println("the ring is full")
 		return false
@@ -134,11 +134,11 @@ func (r *Ring) Take() (id uint64, err error) {
 }
 
 // 当productPosition - consumePosition < paddingSize时, 需要补充id
-func (r *Ring) Product(timestamp uint64) {
+func (r *Ring) product(timestamp uint64) {
 	ids := r.paddingExecutor.execute()
 
 	for i := range ids {
-		put := r.Put(ids[i])
+		put := r.put(ids[i])
 		if !put {
 			return
 		}
