@@ -1,4 +1,4 @@
-module github/XJohn1031/idGenerator
+module github.com/jxohn/idGenerator
 
 go 1.13
 
